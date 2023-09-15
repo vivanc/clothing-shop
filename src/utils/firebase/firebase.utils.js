@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -27,7 +32,13 @@ export const signInWithGooglePopup = () =>
 export const db = getFirestore();
 
 // userAuth argument is the response from log-in-ed google user using auth instance, access its uid property
-export const createUserDocumentFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (
+  userAuth,
+  additionalInformation = {}
+) => {
+  // protect the code if we dont get input
+  if (!userAuth) return;
+
   // create docref (google automatically created a memory space for that uid if it does not exist)
   const userDocRef = doc(db, "users", userAuth.uid);
   console.log(userDocRef);
@@ -49,6 +60,8 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        // add additional information from the createUserDocumentFromAuth function defined
+        ...additionalInformation,
       });
     } catch (error) {
       console.log("error creating the user", error.message);
@@ -56,4 +69,13 @@ export const createUserDocumentFromAuth = async (userAuth) => {
   }
   // if it does exist, it will skip all if block
   return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  // protect the code if we dont get input
+  if (!email || !password) {
+    return;
+  }
+
+  return await createUserWithEmailAndPassword(auth, email, password);
 };
