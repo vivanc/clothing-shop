@@ -1,5 +1,6 @@
 import { ProductsContext } from "../../contexts/products.context.js";
 import ProductCard from "../../components/product-card/product-card.component.js";
+
 import { useContext } from "react";
 import "./shop.styles.scss";
 
