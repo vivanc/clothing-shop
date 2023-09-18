@@ -41,6 +41,7 @@ const SignUpForm = () => {
         email,
         password
       );
+
       // additional information: displayName if no displayName from userAuth
       await createUserDocumentFromAuth(user, { displayName });
       // reset form to empty after the user is created in the function
