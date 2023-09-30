@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 // Helper function to know if to add quantity or create new cart item
 
@@ -28,6 +28,7 @@ export const CartContext = createContext({
   cartItems: [],
   setCartItems: () => {},
   addItemToCart: () => {},
+  cartCount: 0,
 });
 
 // addItemtoCart in the CartContext is to define how to add and create/set new cartItems arrary, then will be used in setCartItems */
@@ -36,12 +37,28 @@ export const CartContext = createContext({
 export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
-  // This addItemToCard is triggered when user click Add Item To Cart on Shop page */
+  const [cartCount, setCartCount] = useState(0);
 
+  // use useEffect to calculate cartCount because we only want recalculation whenever the cartItems array changes
+  useEffect(() => {
+    const newCartCount = cartItems.reduce(
+      (total, cartItem) => (total += cartItem.quantity),
+      0
+    );
+    setCartCount(newCartCount);
+  }, [cartItems]);
+
+  // This addItemToCard is triggered when user click Add Item To Cart on Shop page */
   const addItemToCart = (productToAdd) => {
     setCartItems(addCartItem(cartItems, productToAdd));
   };
-  const value = { isCartOpen, setIsCartOpen, cartItems, addItemToCart };
+  const value = {
+    isCartOpen,
+    setIsCartOpen,
+    cartItems,
+    addItemToCart,
+    cartCount,
+  };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
