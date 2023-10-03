@@ -8,7 +8,14 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDpwU-nU3r1ik9owmSQzZ9ZWmi81UfHGt4",
@@ -33,6 +40,24 @@ export const signInWithGooglePopup = () =>
 
 // instantiate db instance
 export const db = getFirestore();
+
+// create a method to upload shop data to collection in firestore
+// use collectionKey to identify which collection in firebase to add to, objectsToAdd is just the shop-data.js
+// because we are writing it to external source, we use sync
+// transaction concept.
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = collection(db, collectionKey);
+  const batch = writeBatch(db);
+  objectsToAdd.forEach((object) => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+  await batch.commit();
+  console.log("done");
+};
 
 // userAuth argument is the response from log-in-ed google user using auth instance, access its uid property
 export const createUserDocumentFromAuth = async (
