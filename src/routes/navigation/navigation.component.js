@@ -7,7 +7,12 @@ import { signOutUser } from "../../utils/firebase/firebase.utils.js";
 import CartIcon from "../../components/cart-icon/cart-icon.component.js";
 import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component.js";
 
-import "./navigation.styles.scss";
+import {
+  NavigationContainer,
+  LogoContainer,
+  NavLinks,
+  NavLink,
+} from "./navigation.styles.js";
 
 const Navigation = () => {
   //step 1 (context)
@@ -17,29 +22,25 @@ const Navigation = () => {
 
   return (
     <Fragment>
-      <div className="navigation">
-        <Link className="logo-container" to="/">
+      <NavigationContainer>
+        <LogoContainer to="/">
           <CrwnLogo className="logo" />
-        </Link>
-        <div className="nav-links-container">
-          <Link className="link-container" to="/shop">
-            SHOP
-          </Link>
+        </LogoContainer>
+        <NavLinks>
+          <NavLink to="/shop">SHOP</NavLink>
           {/* if there is currentUser (which is set in the context, then show SIGN OUT, otherwise, show SIGN IN) */}
           {currentUser ? (
-            <span className="nav-link" onClick={signOutUser}>
+            <NavLink as="span" onClick={signOutUser}>
               SIGN OUT
-            </span>
+            </NavLink>
           ) : (
-            <Link className="link-container" to="/auth">
-              SIGN IN
-            </Link>
+            <NavLink to="/auth">SIGN IN</NavLink>
           )}
           <CartIcon />
-        </div>
+        </NavLinks>
         {isCartOpen && <CartDropdown />}
         {/* if true, returns the last thing: <CartDropdown /> */}
-      </div>
+      </NavigationContainer>
 
       <Outlet />
     </Fragment>
