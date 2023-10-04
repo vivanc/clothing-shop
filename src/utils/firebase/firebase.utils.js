@@ -44,34 +44,52 @@ export const signInWithGooglePopup = () =>
 export const db = getFirestore();
 
 // create a method to upload shop data to collection in firestore
-// use collectionKey to identify which collection in firebase to add to, objectsToAdd is just the shop-data.js
-// because we are writing it to external source, we use sync
+// use collectionKey (collection name) to identify which collection in firebase to add to, objectsToAdd is just the shop-data.js
+// because we are writing it to external source, we use async
 // transaction concept.
 export const addCollectionAndDocuments = async (
   collectionKey,
-  objectsToAdd
+  objectsToAdd,
+  field = "title" // make it dynamic instead of making it object.title.toLowerCase().
 ) => {
+  // create category table
   const collectionRef = collection(db, collectionKey);
+  // wirte shop-data to category table, and need to apply transaction concept
+  // writeBatch is going to return a batch
   const batch = writeBatch(db);
+  // batch set each single object (category object with title and item array)
   objectsToAdd.forEach((object) => {
-    const docRef = doc(collectionRef, object.title.toLowerCase());
+    // first to get docRef, pass collection ref instead of db, and we need to get title of single object
+    const docRef = doc(collectionRef, object[field].toLowerCase());
+    // batch .set on docRef. set value with 'object' itself to the batch
     batch.set(docRef, object);
   });
+  // commit
   await batch.commit();
+  // console log so we know its done
   console.log("done");
 };
 
+// retrieve category from firebase = get mounted shop data inffo to render on shop page
 export const getCategoriesAndDocuments = async () => {
+  // we can put in collectionKey "categories" because we know what the key is because we just made it from addCollectionAndDocuments
   const collectionRef = collection(db, "categories");
+  // generate a query off the collectionRef to get a snapshot
   const q = query(collectionRef);
 
+  // getDocs fetches the query snapshot
   const querySnapshot = await getDocs(q);
+  // now we can access the querySnapshot to get the arrays, then to reduce it to create the structure we need
+  // finaly end up an object we use.
+
   const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    // destructure off the value of the data of the docSnapshot which is an object
     const { title, items } = docSnapshot.data();
+    // make it as the structure we need, one big object, with title array and 9 items inside the array, item in object format becasue it has name, ide, url...
     acc[title.toLowerCase()] = items;
     return acc;
   }, {});
-
+  // this is an async funciton, so we get back a promise = categoryMap, so to use in useEffect, create another async function, see categories.context
   return categoryMap;
 };
 
