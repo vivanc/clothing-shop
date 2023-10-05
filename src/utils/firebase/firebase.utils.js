@@ -103,13 +103,13 @@ export const createUserDocumentFromAuth = async (
 
   // create docref (google automatically created a memory space for that uid if it does not exist)
   const userDocRef = doc(db, "users", userAuth.uid);
-  console.log(userDocRef);
+  // console.log(userDocRef);
 
   // use getDoc to access the data from the object (userDocRef)
   // use getDoc to check if the object exists in the db -> return true or false
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
+  // console.log(userSnapshot);
+  // console.log(userSnapshot.exists());
 
   // use exists() we can write a logic to setDoc in the db
   if (!userSnapshot.exists()) {
